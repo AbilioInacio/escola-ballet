@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ballet: O Mágico de Oz - Estúdio Arabesque</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@700&family=Poppins:wght@300;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Sixtyfour&family=Titan+One&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --pink: #ec4899;
+        --purple: #8b5cf6;
+        --text-light: #e5e7eb;
+        --bg-black: #000;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Poppins", sans-serif;
+        background-color: var(--bg-black);
+        color: white;
+        overflow-x: hidden;
+      }
+
+      .container {
+        position: relative;
+        min-height: 100vh;
+        text-align: center;
+      }
+
+      .background-img {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+        z-index: 0;
+      }
+
+      .overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          to top,
+          black,
+          rgba(0, 0, 0, 0.8),
+          transparent
+        );
+        z-index: 1;
+      }
+
+      main {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        padding: 2rem;
+      }
+
+      header img {
+        width: 100%;
+        max-width: 250px;
+        margin: 0;
+        padding: 0;
+      }
+
+      header h1 {
+        font-family: "Titan One", sans-serif;
+        font-weight: 400;
+        font-style: normal;
+        background: linear-gradient(to right, var(--pink), var(--purple));
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 1rem;
+      }
+
+      header p {
+        font-weight: 300;
+        font-size: 1.2rem;
+        color: var(--text-light);
+      }
+
+      .info-section {
+        background-color: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(6px);
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 0 25px rgba(139, 92, 246, 0.4);
+        max-width: 900px;
+        margin: 2rem auto;
+        animation: fadeInUp 1s ease-out forwards;
+        opacity: 0;
+        animation-delay: 0.5s;
+      }
+
+      .cards {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+
+      @media (min-width: 768px) {
+        .cards {
+          grid-template-columns: repeat(3, 1fr);
+        }
+
+        header h1 {
+          font-size: 4rem;
+        }
+      }
+
+      .card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 1rem;
+        border-radius: 10px;
+        transition: background-color 0.3s ease;
+      }
+
+      .card:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+      }
+
+      .card svg {
+        width: 40px;
+        height: 40px;
+        color: var(--pink);
+      }
+
+      .card h3 {
+        margin-top: 0.5rem;
+        font-size: 1.3rem;
+        font-weight: 600;
+      }
+
+      .card p {
+        color: var(--text-light);
+        font-weight: 300;
+      }
+
+      .info-text {
+        margin-top: 2rem;
+        border-top: 1px solid rgba(236, 72, 153, 0.5);
+        padding-top: 1.5rem;
+        color: var(--text-light);
+        font-weight: 300;
+        line-height: 1.6;
+        max-width: 600px;
+        margin-inline: auto;
+      }
+
+      footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-color: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(10px);
+        border-top: 1px solid rgba(236, 72, 153, 0.5);
+        padding: 1rem;
+        z-index: 10;
+        animation: fadeInUp 1s ease-out forwards;
+        opacity: 0;
+        animation-delay: 1s;
+      }
+
+      .footer-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        justify-content: center;
+        align-items: center;
+      }
+
+      @media (min-width: 600px) {
+        .footer-buttons {
+          flex-direction: row;
+        }
+      }
+
+      .btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.8rem 2rem;
+        border-radius: 9999px;
+        font-weight: 500;
+        font-size: 1rem;
+        text-decoration: none;
+        transition: all 0.3s ease;
+      }
+
+      .btn svg {
+        width: 24px;
+        height: 24px;
+      }
+
+      .btn-primary {
+        background: linear-gradient(to right, var(--pink), var(--purple));
+        color: white;
+        box-shadow: 0 0 15px rgba(139, 92, 246, 0.6);
+        border: none;
+      }
+
+      .btn-primary:hover {
+        transform: scale(1.05);
+        background: linear-gradient(to right, #db2777, #7c3aed);
+      }
+
+      .btn-outline {
+        background: transparent;
+        color: var(--pink);
+        border: 1px solid var(--pink);
+        box-shadow: 0 0 10px rgba(236, 72, 153, 0.5);
+      }
+
+      .btn-outline:hover {
+        background: var(--pink);
+        color: black;
+      }
+
+      @keyframes fadeInDown {
+        from {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      header {
+        animation: fadeInDown 1s ease-out forwards;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <img
+        src="./Bailarinas.webp"
+        alt="Bailarinas se apresentando no palco"
+        class="background-img"
+      />
+      <div class="overlay"></div>
+
+      <main>
+        <header>
+          <img
+            src="./logo-arabesque-sfundo.webp"
+            alt="Logo Estúdio Arabesque"
+          />
+          <h1>O Mágico de Oz</h1>
+          <p>Um espetáculo de ballet inesquecível</p>
+        </header>
+
+        <section class="info-section">
+          <div class="cards">
+            <div class="card">
+              <svg
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                ></path>
+              </svg>
+              <h3>Data</h3>
+              <p>11 de Dezembro</p>
+            </div>
+
+            <div class="card">
+              <svg
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                ></path>
+              </svg>
+              <h3>Horário</h3>
+              <p>19:00</p>
+            </div>
+
+            <div class="card">
+              <svg
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                ></path>
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                ></path>
+              </svg>
+              <h3>Local</h3>
+              <p>Sindicato Rural Tatersal</p>
+            </div>
+          </div>
+
+          <p class="info-text">
+            Junte-se a Dorothy e seus amigos em uma jornada mágica pela estrada
+            de tijolos amarelos. Uma adaptação encantadora em ballet que promete
+            emocionar e inspirar toda a família. Garanta seu lugar!
+          </p>
+        </section>
+      </main>
+
+      <footer>
+        <div class="footer-buttons">
+          <a
+            id="ticket-link"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="btn btn-primary"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                d="M2 9a3 3 0 0 1 0 6v3a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-3a3 3 0 0 1 0-6V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"
+              />
+              <path d="M13 5v2M13 17v2M13 11v2" />
+            </svg>
+            Comprar Ingressos
+          </a>
+
+          <a
+            id="whatsapp-link"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="btn btn-outline"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.3-1.4c1.45.77 3.05 1.19 4.69 1.19 5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2m.01 1.66c4.54 0 8.25 3.71 8.25 8.25 0 4.54-3.71 8.25-8.25 8.25-1.54 0-3.04-.42-4.34-1.21l-.3-.18-3.22.84.86-3.14-.2-.32a8.19 8.19 0 0 1-1.26-4.49c0-4.54 3.71-8.25 8.25-8.25M9.1 7.33c-.24 0-.44.04-.58.06-.23.04-.46.28-.66.53-.23.29-.83 1-.83 2.41s.85 2.8 1 3a6.06 6.06 0 0 0 2.59 2.16c1.75.73 2.13.62 2.62.56.24-.03.8-.33.92-.65s.12-.65.08-.7-.16-.08-.34-.16a14.25 14.25 0 0 1-1.61-.8c-.16-.06-.27-.12-.38.12s-.34.42-.42.5-.16.12-.3.06a4.39 4.39 0 0 1-1.92-1.18c-.5-.56-.84-1.24-.92-1.44s0-.3.12-.42c.11-.11.24-.28.38-.42.1-.1.16-.18.24-.3.08-.12.04-.24-.02-.34-.07-.12-.34-.81-.46-.98"
+              />
+            </svg>
+            Fale Conosco
+          </a>
+        </div>
+      </footer>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const WHATSAPP_PHONE_NUMBER = "556493394952";
+        const WHATSAPP_MESSAGE =
+          "Olá! Gostaria de mais informações sobre o espetáculo 'O Mágico de Oz'.";
+        const TICKET_LINK = "#";
+
+        const whatsappLink = document.getElementById("whatsapp-link");
+        const ticketLink = document.getElementById("ticket-link");
+
+        if (whatsappLink) {
+          whatsappLink.href = `https://wa.me/${WHATSAPP_PHONE_NUMBER}?text=${encodeURIComponent(
+            WHATSAPP_MESSAGE
+          )}`;
+        }
+
+        if (ticketLink) {
+          ticketLink.href = TICKET_LINK;
+        }
+      });
+    </script>
+  </body>
+</html>
