@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <!-- CORREÇÃO DE ZOOM: Impede o zoom automático ao clicar nos campos no mobile -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+    />
+    <title>Arabesque - Sistema de Gestão</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+      :root {
+        --primary: #e91e63;
+        --dark-pink: #ad1457;
+        --bg: #f7f8fa;
+        --text: #333;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Poppins", sans-serif;
+      }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        -webkit-text-size-adjust: 100%;
+      }
+
+      /* TELA DE LOGIN ATUALIZADA */
+      #login-screen {
+        position: fixed;
+        inset: 0;
+        z-index: 2000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, var(--primary), #6a1b9a);
+      }
+      .login-box {
+        background: white;
+        padding: 50px 40px;
+        border-radius: 25px;
+        width: 90%;
+        max-width: 450px;
+        text-align: center;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      }
+      /* LOGO MAIOR NA TELA DE LOGIN */
+      .login-box img {
+        width: 250px; /* Aumentado de 120px para 250px */
+        height: auto;
+        margin-bottom: 30px;
+        filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.1));
+      }
+      .login-box h3 {
+        margin-bottom: 20px;
+        color: #444;
+        font-weight: 600;
+      }
+
+      /* PREVENÇÃO DE ZOOM: Fonte mínima de 16px para inputs no mobile */
+      input,
+      select,
+      textarea {
+        width: 100%;
+        padding: 14px;
+        margin: 10px 0;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        font-size: 16px !important;
+        background: #fafafa;
+      }
+
+      /* LAYOUT PRINCIPAL */
+      #main-app {
+        display: none;
+        min-height: 100vh;
+      }
+
+      header {
+        background: white;
+        padding: 12px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #eee;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+
+      .container {
+        display: flex;
+        min-height: calc(100vh - 60px);
+      }
+
+      /* SIDEBAR */
+      nav {
+        width: 280px;
+        background: white;
+        border-right: 1px solid #eee;
+        display: flex;
+        flex-direction: column;
+        transition: 0.3s;
+      }
+      .logo-sidebar {
+        padding: 35px 20px;
+        text-align: center;
+        border-bottom: 1px solid #f5f5f5;
+      }
+      .logo-sidebar img {
+        max-width: 160px;
+        height: auto;
+      }
+
+      nav ul {
+        list-style: none;
+        padding: 15px;
+        flex: 1;
+      }
+      nav li {
+        padding: 14px 18px;
+        margin-bottom: 8px;
+        border-radius: 12px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: 0.3s;
+        color: #555;
+        display: flex;
+        align-items: center;
+        font-weight: 500;
+      }
+      nav li:hover,
+      nav li.active {
+        background: var(--primary);
+        color: white;
+        box-shadow: 0 4px 12px rgba(233, 30, 99, 0.3);
+      }
+      nav li.hidden {
+        display: none;
+      }
+
+      main {
+        flex: 1;
+        padding: 25px;
+        overflow-x: hidden;
+      }
+
+      /* CARDS E COMPONENTES */
+      .card {
+        background: white;
+        padding: 25px;
+        border-radius: 20px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+        margin-bottom: 25px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+      }
+      .form-group {
+        margin-bottom: 15px;
+        display: flex;
+        flex-direction: column;
+      }
+      label {
+        font-size: 12px;
+        font-weight: 600;
+        color: #999;
+        margin-bottom: 5px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      button {
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 14px 24px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: 0.3s;
+      }
+      button:active {
+        transform: scale(0.98);
+      }
+      button.pdf {
+        background: #007bff;
+        font-size: 11px;
+        padding: 8px 15px;
+      }
+      button.edit {
+        background: #ffc107;
+        color: #333;
+        font-size: 11px;
+        padding: 8px 15px;
+      }
+      button.delete {
+        background: #dc3545;
+        font-size: 11px;
+        padding: 8px 15px;
+      }
+
+      .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 600px;
+      }
+      th {
+        text-align: left;
+        padding: 15px;
+        font-size: 12px;
+        color: #aaa;
+        text-transform: uppercase;
+      }
+      td {
+        padding: 15px;
+        border-bottom: 1px solid #f8f8f8;
+        font-size: 14px;
+      }
+
+      /* MOBILE RESPONSIVE */
+      .menu-btn {
+        display: none;
+        font-size: 28px;
+        cursor: pointer;
+        color: var(--primary);
+      }
+      @media (max-width: 992px) {
+        .menu-btn {
+          display: block;
+        }
+        nav {
+          position: fixed;
+          left: -280px;
+          height: 100%;
+          z-index: 150;
+          box-shadow: 15px 0 30px rgba(0, 0, 0, 0.1);
+        }
+        nav.open {
+          left: 0;
+        }
+        main {
+          padding: 20px;
+        }
+      }
+
+      .section {
+        display: none;
+      }
+      .section.active {
+        display: block;
+        animation: fadeIn 0.5s ease;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- TELA DE LOGIN -->
+    <div id="login-screen">
+      <div class="login-box">
+        <img src="../logo-arabesque-sfundo.webp" alt="Logo Arabesque" />
+        <h3>Acesso Administrativo</h3>
+        <input type="text" id="user" placeholder="Usuário" />
+        <input type="password" id="pass" placeholder="Senha" />
+        <button
+          onclick="login()"
+          style="width: 100%; margin-top: 15px; font-size: 16px"
+        >
+          Entrar no Sistema
+        </button>
+      </div>
+    </div>
+
+    <!-- SISTEMA PRINCIPAL -->
+    <div id="main-app">
+      <header>
+        <div style="display: flex; align-items: center; gap: 15px">
+          <span class="menu-btn" onclick="toggleMenu()">☰</span>
+          <strong style="color: var(--primary); letter-spacing: 1px"
+            >ARABESQUE</strong
+          >
+        </div>
+        <div id="user-info" style="font-size: 13px; font-weight: 500">
+          <span id="display-role" style="color: #666"></span> |
+          <a
+            href="#"
+            onclick="logout()"
+            style="color: var(--primary); text-decoration: none"
+            >Sair</a
+          >
+        </div>
+      </header>
+
+      <div class="container">
+        <nav id="sidebar">
+          <div class="logo-sidebar">
+            <img src="../logo-arabesque-sfundo.webp" alt="Logo Arabesque" />
+          </div>
+          <ul>
+            <li onclick="showSec('dash')" id="m-dash">Início</li>
+            <li onclick="showSec('equipe')" id="m-equipe">Gerenciar Equipe</li>
+            <li onclick="showSec('alunos')" id="m-alunos">
+              Alunos / Matrículas
+            </li>
+            <li onclick="showSec('cursos')" id="m-cursos">Cursos e Turmas</li>
+            <li onclick="showSec('financeiro')" id="m-financeiro">
+              Financeiro Geral
+            </li>
+            <li onclick="showSec('professor')" id="m-professor">
+              Área do Professor
+            </li>
+          </ul>
+        </nav>
+
+        <main>
+          <!-- DASHBOARD -->
+          <div id="dash" class="section active">
+            <h2 id="welcome-msg" style="margin-bottom: 20px"></h2>
+            <div class="grid">
+              <div class="card" style="border-left: 5px solid var(--primary)">
+                <h3>145</h3>
+                <p>Alunos Ativos</p>
+              </div>
+              <div class="card" style="border-left: 5px solid #4caf50">
+                <h3>R$ 16.800</h3>
+                <p>Receita Estimada</p>
+              </div>
+              <div class="card" style="border-left: 5px solid #ff9800">
+                <h3>8</h3>
+                <p>Pendências Hoje</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- GERENCIAR EQUIPE (SUPER USUÁRIO GERENTE) -->
+          <div id="equipe" class="section">
+            <h2>Gestão de Funcionários e Professores</h2>
+            <div class="card manager-only">
+              <h3>Cadastrar Colaborador</h3>
+              <div class="grid">
+                <div class="form-group">
+                  <label>Nome Completo</label><input type="text" id="fnome" />
+                </div>
+                <div class="form-group">
+                  <label>CPF</label><input type="text" />
+                </div>
+                <div class="form-group">
+                  <label>Cargo</label>
+                  <select id="fcargo">
+                    <option value="professor">Professor(a)</option>
+                    <option value="atendimento">
+                      Funcionário(a) / Atendimento
+                    </option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Salário (R$)</label><input type="number" />
+                </div>
+                <div class="form-group">
+                  <label>Unidade</label><input type="text" />
+                </div>
+                <div class="form-group">
+                  <label>Chave PIX / Banco</label><input type="text" />
+                </div>
+              </div>
+              <button onclick="alert('Cadastro realizado!')">
+                Salvar Colaborador
+              </button>
+            </div>
+
+            <div class="card">
+              <div class="table-responsive">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Nome</th>
+                      <th>Cargo</th>
+                      <th>Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Mariana Silva</td>
+                      <td>Professor</td>
+                      <td>
+                        <button
+                          class="pdf"
+                          onclick="pdfSalario('Mariana Silva', '3200')"
+                        >
+                          Recibo Salário
+                        </button>
+                        <button class="edit manager-only">Editar</button>
+                        <button class="delete manager-only">Excluir</button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- ALUNOS E MATRÍCULA -->
+          <div id="alunos" class="section">
+            <h2>Matrículas e Alunos</h2>
+            <div class="card">
+              <h3>Nova Matrícula</h3>
+              <div class="grid">
+                <div class="form-group">
+                  <label>Nome do Aluno</label><input type="text" id="maluno" />
+                </div>
+                <div class="form-group">
+                  <label>Plano</label>
+                  <select id="mplano">
+                    <option value="Mensal (Recorrente)">Mensal</option>
+                    <option value="Trimestral (Recorrente)">Trimestral</option>
+                    <option value="Semestral (Recorrente)">Semestral</option>
+                    <option value="Anual (Único)">
+                      Anual - Pagamento Único
+                    </option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Valor Pago (R$)</label
+                  ><input type="number" id="mvalor" />
+                </div>
+              </div>
+              <button onclick="pdfMatricula()">
+                Registrar e Gerar Recibo PDF
+              </button>
+            </div>
+          </div>
+
+          <!-- FINANCEIRO -->
+          <div id="financeiro" class="section">
+            <h2>Financeiro Estratégico</h2>
+            <div class="card">
+              <button class="pdf" onclick="pdfFinanceiro()">
+                Gerar Relatório de Lucros (PDF)
+              </button>
+            </div>
+          </div>
+
+          <!-- ÁREA PROFESSOR -->
+          <div id="professor" class="section">
+            <h2>Área Docente</h2>
+            <div class="card">
+              <h4>Minhas Turmas e Horários</h4>
+              <p>Segunda: Baby Ballet (14:00) | Quarta: Adulto (19:00)</p>
+            </div>
+          </div>
+
+          <!-- SEÇÕES EXTRAS SIMULADAS -->
+          <div id="cursos" class="section">
+            <h2>Cursos e Turmas</h2>
+            <div class="card">
+              Configurações de horários e idades...
+              <button class="edit manager-only">Modificar</button>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <script>
+      const { jsPDF } = window.jspdf;
+      let user = null;
+
+      function login() {
+        const u = document.getElementById("user").value.toLowerCase();
+        const p = document.getElementById("pass").value;
+
+        if (p !== "123") return alert("Senha incorreta (use 123)");
+
+        if (u === "gerente") user = { role: "gerente", name: "Super Gerente" };
+        else if (u === "atendimento")
+          user = { role: "atendimento", name: "Atendimento Arabesque" };
+        else if (u === "professor")
+          user = { role: "professor", name: "Prof. Colaborador" };
+        else return alert("Usuário não encontrado.");
+
+        applyPermissions();
+        document.getElementById("login-screen").style.display = "none";
+        document.getElementById("main-app").style.display = "block";
+        document.getElementById("display-role").innerText = user.name;
+        document.getElementById("welcome-msg").innerText =
+          "Bem-vindo, " + user.name;
+      }
+
+      function applyPermissions() {
+        const m = [
+          "m-dash",
+          "m-equipe",
+          "m-alunos",
+          "m-cursos",
+          "m-financeiro",
+          "m-professor",
+        ];
+        m.forEach((id) => document.getElementById(id).classList.add("hidden"));
+
+        if (user.role === "gerente") {
+          m.forEach((id) =>
+            document.getElementById(id).classList.remove("hidden")
+          );
+          toggleManagerOnly(true);
+        } else if (user.role === "atendimento") {
+          ["m-dash", "m-alunos", "m-cursos"].forEach((id) =>
+            document.getElementById(id).classList.remove("hidden")
+          );
+          toggleManagerOnly(false);
+        } else {
+          ["m-dash", "m-professor"].forEach((id) =>
+            document.getElementById(id).classList.remove("hidden")
+          );
+          toggleManagerOnly(false);
+        }
+        showSec("dash");
+      }
+
+      function toggleManagerOnly(show) {
+        document.querySelectorAll(".manager-only").forEach((el) => {
+          el.style.display = show
+            ? el.tagName === "BUTTON"
+              ? "inline-block"
+              : "block"
+            : "none";
+        });
+      }
+
+      function showSec(id) {
+        document
+          .querySelectorAll(".section")
+          .forEach((s) => s.classList.remove("active"));
+        document
+          .querySelectorAll("nav li")
+          .forEach((l) => l.classList.remove("active"));
+        document.getElementById(id).classList.add("active");
+        document.getElementById("m-" + id).classList.add("active");
+        if (window.innerWidth <= 992) toggleMenu();
+      }
+
+      function toggleMenu() {
+        document.getElementById("sidebar").classList.toggle("open");
+      }
+      function logout() {
+        location.reload();
+      }
+
+      // GERADORES DE PDF
+      function pdfSalario(n, v) {
+        const doc = new jsPDF();
+        doc.text("ARABESQUE ESTÚDIO - RECIBO DE SALÁRIO", 105, 20, {
+          align: "center",
+        });
+        doc.text(`Favorecido: ${n}`, 20, 50);
+        doc.text(`Valor Pago: R$ ${v},00`, 20, 60);
+        doc.text(`Data: ${new Date().toLocaleDateString()}`, 20, 70);
+        doc.line(20, 110, 90, 110);
+        doc.text("Assinatura Gerência", 20, 115);
+        doc.line(120, 110, 190, 110);
+        doc.text("Assinatura Colaborador", 120, 115);
+        doc.save(`recibo_salario_${n}.pdf`);
+      }
+
+      function pdfMatricula() {
+        const a = document.getElementById("maluno").value;
+        const v = document.getElementById("mvalor").value;
+        const p = document.getElementById("mplano").value;
+        if (!a || !v) return alert("Preencha o nome e valor!");
+        const doc = new jsPDF();
+        doc.text("RECIBO DE MATRÍCULA - ARABESQUE", 10, 20);
+        doc.text(`Aluno: ${a}`, 10, 40);
+        doc.text(`Plano: ${p}`, 10, 50);
+        doc.text(`Valor Recebido: R$ ${v},00`, 10, 60);
+        doc.text(`Atendente: ${user.name}`, 10, 70);
+        doc.text(
+          "Assinatura Responsável: ___________________________",
+          10,
+          100
+        );
+        doc.save(`recibo_aluno_${a}.pdf`);
+      }
+
+      function pdfFinanceiro() {
+        const doc = new jsPDF();
+        doc.text("BALANÇO FINANCEIRO ARABESQUE", 105, 20, { align: "center" });
+        doc.text(`Gerado em: ${new Date().toLocaleString()}`, 20, 40);
+        doc.text("Receita Bruta: R$ 16.800,00", 20, 60);
+        doc.text("Custos Totais: R$ 5.200,00", 20, 70);
+        doc.text("Resultado Líquido: R$ 11.600,00", 20, 90);
+        doc.save("relatorio_financeiro.pdf");
+      }
+    </script>
+  </body>
+</html>
